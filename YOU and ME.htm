@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-time Chat</title>
+</head>
+<body style="background-color: black;">
+  <h1 style="color: green;">Real-time Chat</h1>
+  <input type="text" id="message" onkeydown="if (event.keyCode === 13) sendMessage()">
+  <div id="chat" style="color: green;">
+  </div>
+
+  <script>
+    function sendMessage() {
+      var message = document.getElementById("message").value;
+      var chat = document.getElementById("chat");
+      chat.innerHTML += "<p style=\"color: green;\">" + message + "</p>";
+      document.getElementById("message").value = "";
+    }
+
+    // Chat object
+    function Chat() {
+      // The list of messages
+      this.messages = [];
+
+      // The connection to the server
+      this.connection = null;
+
+      // The function to send a message
+      this.send = function(message) {
+        if (!this.connection) {
+          return;
+        }
+
+        // Send the message to the server
+        this.connection.send(message);
+      };
+
+      // Start listening for messages
+      this.start = function() {
+        // Create a new WebSocket connection
+        this.connection = new WebSocket('ws://localhost:8080');
+
+        // Listen for messages from the server
+        this.connection.onmessage = function(event) {
+          // Get the message from the event
+          var message = JSON.parse(event.data);
+
+          // Add the message to the list of messages
+          this.messages.push(message);
+
+          // Append the message to the chat container
+          $('#chat-container').append(message);
+        };
+      };
+    }
+  </script>
+</body>
+</html>
